@@ -1,3 +1,4 @@
+// FILE: src/components/workflow/CalculationNode.tsx
 
 import { useState, useEffect, useRef } from 'react';
 import { Handle, Position } from '@xyflow/react';
@@ -193,23 +194,16 @@ export function CalculationNode({ data, id }: CalculationNodeProps) {
           </p>
         </div>
 
-        <div className={`mb-4 p-3 border rounded-md text-center transition-colors duration-300`}
-          style={{
-            background: data.headNumber 
-              ? `linear-gradient(135deg, ${data.headColor?.secondary || '#f8fafc'}, ${isDark ? '#1e293b' : '#ffffff'})`
-              : isDark 
-                ? 'linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))'
-                : 'linear-gradient(to right, rgb(239, 246, 255), rgb(238, 242, 255))',
-            borderColor: data.headColor?.border || (isDark ? '#475569' : '#e2e8f0')
-          }}
-        >
-          <div 
-            className="text-lg font-mono"
-            style={{ color: data.headColor?.primary || (isDark ? '#60a5fa' : '#3730a3') }}
-          >
+        {/* --- THIS IS THE CHANGED PART --- */}
+        <div className={`mb-4 p-3 border rounded-md text-center transition-colors duration-300 ${
+          isDark ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50 border-slate-200'
+        }`}>
+          <div className={`text-2xl font-handwritten ${isDark ? 'text-purple-300' : 'text-purple-600'}`}>
             {data.formula}
           </div>
         </div>
+        {/* --- END OF CHANGED PART --- */}
+
 
         <div className="flex items-center justify-between mb-4 gap-2">
           <div className="flex items-center gap-2">

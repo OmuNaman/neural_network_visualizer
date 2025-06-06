@@ -28,8 +28,8 @@ const LAYER_COLORS = {
 
 export const initialNodes: Node[] = [
   // --- Layer Backgrounds ---
-  { id: 'bg-hidden1', type: 'layerBackground', position: { x: col1 - 50, y: row0 - 100 }, data: { label: 'Hidden Layer 1', color: LAYER_COLORS.hidden1 }, style: { width: '1050px', height: '1100px' }, zIndex: -1 },
-  { id: 'bg-hidden2', type: 'layerBackground', position: { x: col3 - 50, y: row0 - 100 }, data: { label: 'Hidden Layer 2', color: LAYER_COLORS.hidden2 }, style: { width: '1050px', height: '1100px' }, zIndex: -1 },
+  //{ id: 'bg-hidden1', type: 'layerBackground', position: { x: col1 - 50, y: row0 - 100 }, data: { label: 'Hidden Layer 1', color: LAYER_COLORS.hidden1 }, style: { width: '1050px', height: '1100px' }, zIndex: -1 },
+  //{ id: 'bg-hidden2', type: 'layerBackground', position: { x: col3 - 50, y: row0 - 100 }, data: { label: 'Hidden Layer 2', color: LAYER_COLORS.hidden2 }, style: { width: '1050px', height: '1100px' }, zIndex: -1 },
   
   // --- Input Layer ---
   { id: 'input', type: 'matrix', position: { x: col0, y: row1 }, data: { label: 'Input (A⁰)', matrix: NN_INPUT, description: '1x2 Vector' } },
