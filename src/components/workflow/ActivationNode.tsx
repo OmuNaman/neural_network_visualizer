@@ -30,6 +30,26 @@ export function ActivationNode({ data, id }: ActivationNodeProps) {
   const [isCompleted, setIsCompleted] = useState(false);
   const [errors, setErrors] = useState<boolean[][]>([]);
 
+  // --- START: ADDED SOUND LOGIC ---
+  const correctAudioRef = useRef<HTMLAudioElement | null>(null);
+  const wrongAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    correctAudioRef.current = new Audio('/correct.mp3');
+    wrongAudioRef.current = new Audio('/wrong.mp3');
+    correctAudioRef.current.load();
+    wrongAudioRef.current.load();
+  }, []);
+
+  const playSound = (isCorrect: boolean) => {
+    const audioElement = isCorrect ? correctAudioRef.current : wrongAudioRef.current;
+    if (audioElement) {
+      audioElement.currentTime = 0;
+      audioElement.play().catch(e => console.error("Error playing sound:", e));
+    }
+  };
+  // --- END: ADDED SOUND LOGIC ---
+
   useEffect(() => {
     if (data.disabled) return;
     setUserMatrix(initialMatrix());
@@ -51,6 +71,9 @@ export function ActivationNode({ data, id }: ActivationNodeProps) {
     
     const allValid = newErrors.every(row => row.every(cellError => !cellError));
     setErrors(newErrors);
+    
+    // --- CALLING playSound() HERE ---
+    playSound(allValid); 
     
     if (allValid) {
       setIsCompleted(true);
@@ -100,8 +123,7 @@ export function ActivationNode({ data, id }: ActivationNodeProps) {
         <div className="flex justify-end mb-4">
           <Button
             onClick={() => {
-              const validationResult = validateMatrix(userMatrix);
-              // playSound(validationResult); // Sound logic can be added later
+              validateMatrix(userMatrix);
             }}
             variant="outline"
             size="sm"

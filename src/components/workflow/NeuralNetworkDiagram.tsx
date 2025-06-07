@@ -36,28 +36,57 @@ export function NeuralNetworkDiagram({ architecture, activeNodeId }: NeuralNetwo
 
   const themeColors = {
     inactive: isDark ? 'rgba(100, 116, 139, 0.3)' : 'rgba(156, 163, 175, 0.4)',
-    activeNeuron: isDark ? '#38bdf8' : '#0ea5e9', // Light Blue
-    activeConnection: isDark ? '#a78bfa' : '#8b5cf6', // Purple
+    activeNeuron: isDark ? '#38bdf8' : '#0ea5e9',
+    activeConnection: isDark ? '#a78bfa' : '#8b5cf6',
+    pulse: isDark ? '#f0abfc' : '#e879f9', // Light purple/pink for the pulse
   };
 
   return (
     <div className={`w-full h-full p-4 rounded-lg flex items-center justify-center transition-colors ${isDark ? 'bg-slate-900/50' : 'bg-slate-100'}`}>
       <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%">
+        {/* --- START: SVG Filter for Glow Effect --- */}
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        {/* --- END: SVG Filter --- */}
+
         {/* Connections */}
         {positions.slice(0, -1).map((layer, i) => {
           const isConnectionsActive = (progress === (i * 2) + 1);
           return layer.map((startNode, j) =>
             positions[i + 1].map((endNode, k) => (
-              <motion.line
-                key={`line-${i}-${j}-${k}`}
-                x1={startNode.x} y1={startNode.y}
-                x2={endNode.x} y2={endNode.y}
-                stroke={isConnectionsActive ? themeColors.activeConnection : themeColors.inactive}
-                strokeWidth={isConnectionsActive ? 1.5 : 0.5}
-                initial={{ opacity: 0.3 }}
-                animate={{ opacity: isConnectionsActive ? 1 : 0.3 }}
-                transition={{ duration: 0.3 }}
-              />
+              <g key={`group-${i}-${j}-${k}`}>
+                <motion.line
+                  x1={startNode.x} y1={startNode.y}
+                  x2={endNode.x} y2={endNode.y}
+                  stroke={isConnectionsActive ? themeColors.activeConnection : themeColors.inactive}
+                  strokeWidth={isConnectionsActive ? 1.5 : 0.5}
+                  transition={{ duration: 0.3 }}
+                />
+                {/* --- START: Animated Pulse --- */}
+                {isConnectionsActive && (
+                  <motion.circle
+                    r="3"
+                    fill={themeColors.pulse}
+                    initial={{ cx: startNode.x, cy: startNode.y, opacity: 0 }}
+                    animate={{ cx: endNode.x, cy: endNode.y, opacity: [0, 1, 1, 0] }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      repeatDelay: 1,
+                      ease: "linear",
+                      delay: (j * 0.1) + (k * 0.05), // Stagger the animations
+                    }}
+                  />
+                )}
+                {/* --- END: Animated Pulse --- */}
+              </g>
             ))
           );
         })}
@@ -74,9 +103,14 @@ export function NeuralNetworkDiagram({ architecture, activeNodeId }: NeuralNetwo
               fill={isLayerActive ? themeColors.activeNeuron : themeColors.inactive}
               stroke={isLayerActive ? themeColors.activeNeuron : 'none'}
               strokeWidth={2}
-              initial={{ scale: 1 }}
-              animate={{ scale: isLayerActive ? 1.2 : 1 }}
-              transition={{ duration: 0.3 }}
+              // --- START: Apply Glow Filter ---
+              style={{ filter: isLayerActive ? 'url(#glow)' : 'none' }}
+              // --- END: Apply Glow Filter ---
+              animate={{ scale: isLayerActive ? [1, 1.3, 1] : 1 }}
+              transition={{
+                duration: 1,
+                repeat: isLayerActive ? Infinity : 0,
+              }}
             />
           ));
         })}
