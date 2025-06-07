@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MatrixInput } from '@/components/MatrixInput';
 import { useTheme } from '@/components/ThemeProvider';
-import { Zap, CheckCircle, Lightbulb, CheckCircle2 } from 'lucide-react';
+import { Zap, CheckCircle, Lightbulb, CheckCircle2, RotateCcw } from 'lucide-react'; // Added RotateCcw
 import { motion } from 'framer-motion';
 
 interface ActivationNodeProps {
@@ -30,7 +30,6 @@ export function ActivationNode({ data, id }: ActivationNodeProps) {
   const [isCompleted, setIsCompleted] = useState(false);
   const [errors, setErrors] = useState<boolean[][]>([]);
 
-  // --- START: ADDED SOUND LOGIC ---
   const correctAudioRef = useRef<HTMLAudioElement | null>(null);
   const wrongAudioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -48,7 +47,6 @@ export function ActivationNode({ data, id }: ActivationNodeProps) {
       audioElement.play().catch(e => console.error("Error playing sound:", e));
     }
   };
-  // --- END: ADDED SOUND LOGIC ---
 
   useEffect(() => {
     if (data.disabled) return;
@@ -72,7 +70,6 @@ export function ActivationNode({ data, id }: ActivationNodeProps) {
     const allValid = newErrors.every(row => row.every(cellError => !cellError));
     setErrors(newErrors);
     
-    // --- CALLING playSound() HERE ---
     playSound(allValid); 
     
     if (allValid) {
@@ -81,6 +78,13 @@ export function ActivationNode({ data, id }: ActivationNodeProps) {
     }
     
     return allValid;
+  };
+
+  // --- ADDED RESET FUNCTION ---
+  const resetMatrix = () => {
+    if (data.disabled || isCompleted) return;
+    setUserMatrix(initialMatrix());
+    setErrors([]);
   };
 
   return (
@@ -120,23 +124,37 @@ export function ActivationNode({ data, id }: ActivationNodeProps) {
           </div>
         </div>
         
-        <div className="flex justify-end mb-4">
-          <Button
-            onClick={() => {
-              validateMatrix(userMatrix);
-            }}
-            variant="outline"
-            size="sm"
-            disabled={data.disabled || isCompleted}
-            className={`flex items-center gap-1 transition-colors duration-150 ${
-              isDark 
-                ? 'text-emerald-300 border-emerald-600 hover:bg-emerald-700 hover:text-emerald-100 disabled:opacity-50' 
-                : 'text-emerald-600 border-emerald-300 hover:bg-emerald-100 hover:text-emerald-800 disabled:opacity-50'
-            }`}
-          >
-            <CheckCircle2 className="w-3 h-3" />
-            Verify
-          </Button>
+        {/* --- ADDED RESET BUTTON HERE --- */}
+        <div className="flex justify-between items-center mb-4 gap-2">
+            <Button
+              onClick={resetMatrix}
+              variant="outline"
+              size="sm"
+              disabled={data.disabled || isCompleted}
+              className={`flex items-center gap-1 transition-colors duration-150 ${
+                isDark ? 'text-slate-300 border-slate-600 hover:bg-slate-700 hover:text-slate-100 disabled:opacity-50' 
+                       : 'text-slate-600 border-slate-300 hover:bg-slate-100 hover:text-slate-800 disabled:opacity-50'
+              }`}
+            >
+              <RotateCcw className="w-3 h-3" />
+              Reset
+            </Button>
+            <Button
+              onClick={() => {
+                validateMatrix(userMatrix);
+              }}
+              variant="outline"
+              size="sm"
+              disabled={data.disabled || isCompleted}
+              className={`flex items-center gap-1 transition-colors duration-150 ${
+                isDark 
+                  ? 'text-emerald-300 border-emerald-600 hover:bg-emerald-700 hover:text-emerald-100 disabled:opacity-50' 
+                  : 'text-emerald-600 border-emerald-300 hover:bg-emerald-100 hover:text-emerald-800 disabled:opacity-50'
+              }`}
+            >
+              <CheckCircle2 className="w-3 h-3" />
+              Verify
+            </Button>
         </div>
 
         <div className="flex justify-center">

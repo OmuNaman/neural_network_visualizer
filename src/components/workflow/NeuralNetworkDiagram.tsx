@@ -38,23 +38,13 @@ export function NeuralNetworkDiagram({ architecture, activeNodeId }: NeuralNetwo
     inactive: isDark ? 'rgba(100, 116, 139, 0.3)' : 'rgba(156, 163, 175, 0.4)',
     activeNeuron: isDark ? '#38bdf8' : '#0ea5e9',
     activeConnection: isDark ? '#a78bfa' : '#8b5cf6',
-    pulse: isDark ? '#f0abfc' : '#e879f9', // Light purple/pink for the pulse
+    pulse: isDark ? '#f0abfc' : '#e879f9',
   };
 
   return (
     <div className={`w-full h-full p-4 rounded-lg flex items-center justify-center transition-colors ${isDark ? 'bg-slate-900/50' : 'bg-slate-100'}`}>
       <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%">
-        {/* --- START: SVG Filter for Glow Effect --- */}
-        <defs>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-        {/* --- END: SVG Filter --- */}
+        {/* --- REMOVED THE <defs> and <filter> SECTION --- */}
 
         {/* Connections */}
         {positions.slice(0, -1).map((layer, i) => {
@@ -69,7 +59,6 @@ export function NeuralNetworkDiagram({ architecture, activeNodeId }: NeuralNetwo
                   strokeWidth={isConnectionsActive ? 1.5 : 0.5}
                   transition={{ duration: 0.3 }}
                 />
-                {/* --- START: Animated Pulse --- */}
                 {isConnectionsActive && (
                   <motion.circle
                     r="3"
@@ -81,11 +70,10 @@ export function NeuralNetworkDiagram({ architecture, activeNodeId }: NeuralNetwo
                       repeat: Infinity,
                       repeatDelay: 1,
                       ease: "linear",
-                      delay: (j * 0.1) + (k * 0.05), // Stagger the animations
+                      delay: (j * 0.1) + (k * 0.05),
                     }}
                   />
                 )}
-                {/* --- END: Animated Pulse --- */}
               </g>
             ))
           );
@@ -103,9 +91,13 @@ export function NeuralNetworkDiagram({ architecture, activeNodeId }: NeuralNetwo
               fill={isLayerActive ? themeColors.activeNeuron : themeColors.inactive}
               stroke={isLayerActive ? themeColors.activeNeuron : 'none'}
               strokeWidth={2}
-              // --- START: Apply Glow Filter ---
-              style={{ filter: isLayerActive ? 'url(#glow)' : 'none' }}
-              // --- END: Apply Glow Filter ---
+              // --- THIS IS THE FIX: Using a drop-shadow filter ---
+              style={{
+                filter: isLayerActive
+                  ? `drop-shadow(0 0 4px ${themeColors.activeNeuron})`
+                  : 'none',
+              }}
+              // --- END OF FIX ---
               animate={{ scale: isLayerActive ? [1, 1.3, 1] : 1 }}
               transition={{
                 duration: 1,
